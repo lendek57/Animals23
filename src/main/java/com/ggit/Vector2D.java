@@ -26,7 +26,7 @@ public class Vector2D {
         return new Vector2D(-x, -y);
     }
 
-    public Vector2D subtrack(Vector2D other) {
+    public Vector2D subtract(Vector2D other) {
         return add(other.opposite());
     }
 
