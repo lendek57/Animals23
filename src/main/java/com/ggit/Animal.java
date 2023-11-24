@@ -2,13 +2,20 @@ package com.ggit;
 
 public class Animal {
     private Vector2D position;
+    private final int id;
+    private static int counter = 1;
 
     public Animal(Vector2D position) {
         this.position = position;
+        this.id = counter++;
     }
 
     public Vector2D getPosition() {
         return position;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void move(MapDirection direction) {
