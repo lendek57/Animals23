@@ -1,7 +1,5 @@
 package com.ggit;
 
-import java.util.Random;
-
 public class World {
 
     private static final int defaultDaysNumber = 10;
