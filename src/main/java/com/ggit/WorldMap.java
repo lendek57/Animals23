@@ -1,11 +1,10 @@
 package com.ggit;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class WorldMap extends AbstractWorldMap {
-    private List<Plant> plants;
+    private Map<Vector2D, Plant> plants;
+    private Map<Vector2D, Animal> animalsMap;
     private List<Animal> animals;
     private static final int noOfPlants = 25;
     private static final int noOfAnimals = 5;
@@ -14,9 +13,16 @@ public class WorldMap extends AbstractWorldMap {
     public WorldMap(int width, int height) {
         super(width, height);
         animals = new LinkedList<>();
-        plants = new LinkedList<>();
+        animalsMap = new HashMap<>();
+        plants = new HashMap<>();
         for (int i = 0; i < noOfPlants; i++) addPlant();
-        for (int i = 0; i < noOfAnimals; i++) animals.add(new Animal(getRandomPosition()));
+        for (int i = 0; i < noOfAnimals; i++) addAnimal();
+    }
+
+    private void addAnimal() {
+        Animal animal = new Animal(getRandomPosition());
+        animals.add(animal);
+        animalsMap.put(animal.getPosition(), animal);
     }
 
     private void addPlant() {
@@ -26,16 +32,11 @@ public class WorldMap extends AbstractWorldMap {
         while (isOccupiedByPlant(position)) {
             position = getRandomPosition();
         }
-        plants.add(new Plant(position));
+        plants.put(position, new Plant(position));
     }
 
     private boolean isOccupiedByPlant(Vector2D position) {
-        for (Plant plant : plants) {
-            if (plant.getPosition().equals(position)) {
-                return true;
-            }
-        }
-        return false;
+        return plants.containsKey(position);
     }
 
     private Vector2D getRandomPosition() {
@@ -44,21 +45,21 @@ public class WorldMap extends AbstractWorldMap {
 
     @Override
     public void run() {
+        animalsMap.clear();
         for (Animal animal : animals) {
             animal.move(MapDirection.values()[random.nextInt(MapDirection.values().length)]);
+            animalsMap.put(animal.getPosition(), animal);
         }
     }
 
     @Override
     public void eat() {
-        for (Animal animal : animals) {
-            for (Plant plant : plants) {
-                if (animal.getPosition().equals(plant.getPosition())) {
-                    System.out.printf("Zwierzę %d zjadło roślinę%n", animal.getId());
-                    plants.remove(plant);
-                    addPlant();
-                    break;
-                }
+        for (Map.Entry<Vector2D, Animal> animalOnPosition : animalsMap.entrySet()) {
+            Vector2D position = animalOnPosition.getKey();
+            if (isOccupiedByPlant(position)) {
+                System.out.printf("Zwierzę %d zjadło roślinę%n", animalOnPosition.getValue().getId());
+                plants.remove(position);
+                addPlant();
             }
         }
     }
